@@ -241,7 +241,27 @@ if uploaded_file is not None:
             summary=filtered_df.to_string()
         
         # Convert summary to text
-        data_sample = str(summary)
+        data_sample = f"""
+
+        Dataset Sample:
+        {filtered_df.head(50).to_string()}
+
+        Revenue Summary:
+        {filtered_df['Revenue'].describe().to_string()}
+
+        Profit Summary:
+        {filtered_df['Profit'].describe().to_string()}
+
+        Top Products:
+        {filtered_df.groupby('Product')['Revenue'].sum().sort_values(ascending=False).head(10).to_string()}
+
+        Top Regions:
+        {filtered_df.groupby('Region')['Revenue'].sum().sort_values(ascending=False).to_string()}
+
+        Top Salespersons:
+        {filtered_df.groupby('SalesPerson')['Revenue'].sum().sort_values(ascending=False).head(10).to_string()}
+
+"""
 
         # Prompt
         prompt = f"""
@@ -267,14 +287,25 @@ if uploaded_file is not None:
         -keep answer concise and professional
         """
 
-        # AI response
-        with st.spinner("Analyzing data..."):
+    # AI response
+with st.spinner("Analyzing data..."):
 
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-            
+    try:
+
+        response = client.models.generate_content(
+
+            model="gemini-1.5-flash",
+
+            contents=prompt
+        )
+
+        st.subheader("AI Insight")
+
+        st.write(response.text)
+
+    except Exception as e:
+
+        st.error(f"AI Error: {e}")
 
         st.subheader("AI Insight")
 
