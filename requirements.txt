@@ -1,0 +1,7 @@
+streamlit 
+pandas
+SQL
+Excel
+matplotlib
+google_genai
+openpyxl
