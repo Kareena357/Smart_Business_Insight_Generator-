@@ -301,6 +301,9 @@ with st.spinner("Analyzing data..."):
 
         st.subheader("AI Insight")
 
+        
+
+
         st.write(response.text)
 
     except Exception as e:
