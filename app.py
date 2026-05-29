@@ -183,149 +183,56 @@ if uploaded_file is not None:
     )
 
     # Run AI if question entered
-    if question != "":
+    # Run AI if question entered
+# Run AI if question entered
+if question != "":
 
-        question_lower = question.lower()
-        # Revenue by month
-        if "month" in question_lower or "trend" in question_lower:
+    prompt = f"""
+    You are a professional business data analyst.
 
+    Dataset (sample):
+    {filtered_df.head(50).to_string()}
 
-         # Convert date column
-             df['Date'] = pd.to_datetime(df['Date'])
+    User Question:
+    {question}
 
-         # Create month column
-             df['Month'] = df['Date'].dt.month_name()
-
-             summary = filtered_df.groupby(
-              'Month'
-             )['Revenue'].sum()
-
-        # Product analysis
-        elif "product" in question_lower:
-            summary=filtered_df.groupby(
-                'Product'
-            )['Revenue'].sum().sort_values(
-                ascending=False 
-            )
-        # Region analysis
-        elif "region" in question_lower:
-            summary=filtered_df.groupby(
-                'Region'
-            )['Revenue'].sum().sort_values(
-                ascending=False
-            )
-        #Profit analysis 
-        elif "profit" in question_lower:
-            summary = filtered_df.groupby(
-                'Product'
-            )['Profit'].sum().sort_values(
-                ascending=False
-            )
-        # Cost analysis
-        elif "cost" in question_lower:
-            summary= filtered_df.groupby(
-               'Product' 
-            )['Cost'].sum().sort_values(
-                ascending=False
-            )
-        #SalesPerson analysis
-        elif "salesperson" in question_lower:
-            summary = filtered_df.groupby(
-                'salesperson'
-
-            )['revenue'].sum().sort_values(
-                ascending=False
-            )
-        #Default
-        else:
-            summary=filtered_df.to_string()
-        
-        # Convert summary to text
-        data_sample = f"""
-
-        Dataset Sample:
-        {filtered_df.head(50).to_string()}
-
-        Revenue Summary:
-        {filtered_df['Revenue'].describe().to_string()}
-
-        Profit Summary:
-        {filtered_df['Profit'].describe().to_string()}
-
-        Top Products:
-        {filtered_df.groupby('Product')['Revenue'].sum().sort_values(ascending=False).head(10).to_string()}
-
-        Top Regions:
-        {filtered_df.groupby('Region')['Revenue'].sum().sort_values(ascending=False).to_string()}
-
-        Top Salespersons:
-        {filtered_df.groupby('SalesPerson')['Revenue'].sum().sort_values(ascending=False).head(10).to_string()}
-
-"""
-
-        # Prompt
-        prompt = f"""
-        You are a  professional business data analyst.
-
-        Dataset Summary:
-        {data_sample}
-
-        User Question:
-        {question}
-
-        IMPORTANT:
-        - Answer only using provided dataset
-        - Do not create fake information
-        - Analyze products, regions, profit, cost ,revenue, and salesperson if 
-        relevant 
-        - Give concise business insights
-        - Explain trends and patterns 
-        - Avoid repeating too many raw numbers
-        - Explain possible reasons behind poor performance 
-        - If revenue, profit is decreasing , provide recommendations
-        - If products perform poorly, suggest improvement stratergies
-        -keep answer concise and professional
-        """
-
-    # AI response
-with st.spinner("Analyzing data..."):
+    Instructions:
+    - Use only given dataset
+    - Be concise and professional
+    - Give insights, trends, and recommendations
+    - Give solution , explain problems and give suggestions
+    
+    """
 
     try:
+        with st.spinner("Analyzing data..."):
 
-        response = client.models.generate_content(
-
-            model="gemini-1.5-flash",
-
-            contents=prompt
-        )
-
-        st.subheader("AI Insight")
-
-        
-
-
-        st.write(response.text)
-
-    except Exception as e:
-
-        st.error(f"AI Error: {e}")
+            response = client.models.generate_content(
+                model="gemini-1.5-flash",
+                contents=prompt
+            )
 
         st.subheader("AI Insight")
-
         st.write(response.text)
 
+        # Download AI result
         st.download_button(
-            label = "Download AI Insight",
-            data= response.text,
+            label="Download AI Insight",
+            data=response.text,
             file_name="AI_Insight_Report.txt",
-            mime= "text/plain"
+            mime="text/plain"
         )
+
+        # Download filtered CSV
         csv = filtered_df.to_csv(index=False)
+
         st.download_button(
-            label="Download Filetered Data CSV",
+            label="Download Filtered Data CSV",
             data=csv,
-            file_name= "Filtered_Data.csv",
+            file_name="Filtered_Data.csv",
             mime="text/csv"
         )
 
+    except Exception as e:
+        st.error(f"AI Error: {e}")
         
