@@ -23,7 +23,7 @@ def login():
             st.error("Invalid Username or Password ")
 
 client= genai.Client(
-    api_key="AIzaSyD2AdQjcnzlAVwONIsfO9TPT2FHj373XTY"
+    api_key=st.secrets["GOOGLE_API_KEY"]
 )
 
 # Title
